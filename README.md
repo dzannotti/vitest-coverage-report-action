@@ -1,6 +1,6 @@
-# vitest-coverage-report-action
+# bun-test-coverage-report-action
 
-This GitHub Action reports [vitest](https://vitest.dev/) coverage results as a GitHub step-summary and as a comment on a pull request.
+This GitHub Action reports [bun test](https://bun.sh/docs/cli/test) coverage results as a GitHub step-summary and as a comment on a pull request.
 
 ![Coverage Report as Step Summary](./docs/coverage-report.png)
 
@@ -10,29 +10,16 @@ Want to contribute? Check out the [Contributing Guidelines](./CONTRIBUTING.md).
 
 ## Usage
 
-To use this action, you need to configure `vitest` to create a coverage report with the following reporters:
+To use this action, you need to configure `bun test` to create a coverage report in LCOV format.
 
-- `json-summary` (required): This reporter generates a high-level summary of your overall coverage.
-- `json` (optional): If provided, this reporter generates file-specific coverage reports for each file in your project.
+You can configure coverage in your bunfig.toml file as follows:
 
-You can configure the reporters in your Vite configuration file (e.g., `vite.config.js`) as follows:
-
-```js
-import { defineConfig } from 'vite';
-
-export default defineConfig({
-  test: {
-    coverage: {
-      // you can include other reporters, but 'json-summary' is required, json is recommended
-      reporter: ['text', 'json-summary', 'json'],
-      // If you want a coverage reports even if your tests are failing, include the reportOnFailure option
-      reportOnFailure: true,
-    }
-  }
-});
+```toml
+[test]
+coverage = true
 ```
 
-Then execute `npx vitest --coverage.enabled true` in a step before this action.
+Then execute `bun test --coverage --coverage-reporter=lcov` in a step before this action.
 
 ### Example Workflow
 
@@ -53,19 +40,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: 'Install Node'
-      uses: actions/setup-node@v4
+    - name: 'Install Bun'
+      uses: oven-sh/setup-bun@v1
       with:
-        node-version: '20.x'
+        bun-version: latest
     - name: 'Install Deps'
-      run: npm install
+      run: bun install
     - name: 'Test'
-      run: npx vitest --coverage.enabled true
+      run: bun test --coverage --coverage-reporter=lcov
     - name: 'Report Coverage'
       # Set if: always() to also generate the report if tests are failing
       # Only works if you set `reportOnFailure: true` in your vite config as specified above
       if: always() 
-      uses:  davelosert/vitest-coverage-report-action@v2
+      uses:  dzannotti/bun-test-coverage-report-action@v1
 ```
 
 > [!NOTE]
@@ -80,10 +67,9 @@ This action requires the `pull-requests: write` permission to add a comment to y
 | Option                      | Description                                                                                                                                                                                                                                                      | Default                                                                                                                                                                                                                                                            |
 | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `working-directory`         | The main path to search for coverage- and configuration files (adjusting this is especially useful in monorepos).                                                                                                                                                | `./`                                                                                                                                                                                                                                                               |
-| `json-summary-path`         | The path to the json summary file.                                                                                                                                                                                                                               | `${working-directory}/coverage/coverage-summary.json`                                                                                                                                                                                                              |
-| `json-final-path`           | The path to the json final file.                                                                                                                                                                                                                                 | `${working-directory}/coverage/coverage-final.json`                                                                                                                                                                                                                |
-| `json-summary-compare-path` | The path to the json summary file to compare against. If given, will display a trend indicator and the difference in the summary. Respects the `working-directory` option.                                                                                       | undefined                                                                                                                                                                                                                                                          |
-| `vite-config-path`          | The path to the vite config file. Will check the same paths as vite and vitest                                                                                                                                                                                   | Checks pattern `${working-directory}/vite[st].config.{t\|mt\|ct\|j\|mj\|cj}s`                                                                                                                   |
+| `lcov-path`                 | The path to the lcov.info file.                                                                                                                                                                                                                                  | `${working-directory}/coverage/lcov.info`                                                                                                                                                                                                                          |
+| `lcov-compare-path`         | The path to the lcov.info file to compare against. If given, will display a trend indicator and the difference in the summary. Respects the `working-directory` option.                                                                                         | undefined                                                                                                                                                                                                                                                          |
+| `bunfig-path`               | The path to the bunfig.toml file. Will check for bunfig.toml in the project root                                                                                                                                                                                | Checks for `${working-directory}/bunfig.toml`                                                                                                                                                         |
 | `github-token`              | A GitHub access token with permissions to write to issues (defaults to `secrets.GITHUB_TOKEN`).                                                                                                                                                                  | `${{ github.token }}`                                                                                                                                                                                                                                              |
 | `file-coverage-mode`        | Defines how file-based coverage is reported. Possible values are `all`, `changes` or `none`.                                                                                                                                                                     | `changes`                                                                                                                                                                                                                                                          |
 | `file-coverage-root-path`   | The root (or absolute) part of the path used within the json coverage reports to point to the covered files. You can change this if your reports were generated in a different context (e.g., a docker container) and the absolute paths don't match the current runner's workspace. Uses the runner's workspace path by default. | `${{ github.workspace }}`                                                                                                                                                                                                                                          |
@@ -105,14 +91,14 @@ If your project includes multiple test suites and you want to consolidate their 
 ## ...
     - name: 'Report Frontend Coverage'
       if: always() # Also generate the report if tests are failing
-      uses:  davelosert/vitest-coverage-report-action@v2
+      uses:  dzannotti/bun-test-coverage-report-action@v1
       with:
         name: 'Frontend'
         json-summary-path: './coverage/coverage-summary-frontend.json'
         json-final-path: './coverage/coverage-final-frontend.json
     - name: 'Report Backend Coverage'
       if: always() # Also generate the report if tests are failing
-      uses:  davelosert/vitest-coverage-report-action@v2
+      uses:  dzannotti/bun-test-coverage-report-action@v1
       with:
         name: 'Backend'
         json-summary-path: './coverage/coverage-summary-backend.json'

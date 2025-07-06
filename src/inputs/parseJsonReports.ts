@@ -5,7 +5,7 @@ import { stripIndent } from "common-tags";
 import type { JsonFinal } from "../types/JsonFinal";
 import type { JsonSummary } from "../types/JsonSummary";
 
-const parseVitestCoverageReport = async <type extends JsonSummary | JsonFinal>(
+const parseBunCoverageReport = async <type extends JsonSummary | JsonFinal>(
 	jsonPath: string,
 ): Promise<type> => {
 	const resolvedJsonSummaryPath = path.resolve(process.cwd(), jsonPath);
@@ -13,16 +13,16 @@ const parseVitestCoverageReport = async <type extends JsonSummary | JsonFinal>(
 	return JSON.parse(jsonSummaryRaw.toString()) as type;
 };
 
-const parseVitestJsonSummary = async (
+const parseBunJsonSummary = async (
 	jsonSummaryPath: string,
 ): Promise<JsonSummary> => {
 	try {
-		return await parseVitestCoverageReport<JsonSummary>(jsonSummaryPath);
+		return await parseBunCoverageReport<JsonSummary>(jsonSummaryPath);
 	} catch (err: unknown) {
 		const stack = err instanceof Error ? err.stack : "";
 		core.setFailed(stripIndent`
         Failed to parse the json-summary at path "${jsonSummaryPath}."
-        Make sure to run vitest before this action and to include the "json-summary" reporter.
+        Make sure to run bun test --coverage before this action and to include the "json-summary" reporter.
 
         Original Error:
         ${stack}
@@ -33,16 +33,16 @@ const parseVitestJsonSummary = async (
 	}
 };
 
-const parseVitestJsonFinal = async (
+const parseBunJsonFinal = async (
 	jsonFinalPath: string,
 ): Promise<JsonFinal> => {
 	try {
-		return await parseVitestCoverageReport<JsonFinal>(jsonFinalPath);
+		return await parseBunCoverageReport<JsonFinal>(jsonFinalPath);
 	} catch (err: unknown) {
 		const stack = err instanceof Error ? err.stack : "";
 		core.warning(stripIndent`
       Failed to parse JSON Final at path "${jsonFinalPath}".
-      Line coverage will be empty. To include it, make sure to include the "json" reporter in your vitest execution.
+      Line coverage will be empty. To include it, make sure to include the "json" reporter in your bun test execution.
 
       Original Error:
       ${stack}
@@ -51,4 +51,4 @@ const parseVitestJsonFinal = async (
 	}
 };
 
-export { parseVitestJsonSummary, parseVitestJsonFinal };
+export { parseBunJsonSummary as parseVitestJsonSummary, parseBunJsonFinal as parseVitestJsonFinal };

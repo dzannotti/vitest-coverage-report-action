@@ -11,9 +11,8 @@ import { parseCoverageThresholds } from "./parseCoverageThresholds";
 
 type Options = {
 	fileCoverageMode: FileCoverageMode;
-	jsonFinalPath: string;
-	jsonSummaryPath: string;
-	jsonSummaryComparePath: string | null;
+	lcovPath: string;
+	lcovComparePath: string | null;
 	name: string;
 	thresholds: Thresholds;
 	workingDirectory: string;
@@ -30,22 +29,17 @@ async function readOptions(octokit: Octokit): Promise<Options> {
 	const fileCoverageModeRaw = core.getInput("file-coverage-mode"); // all/changes/none
 	const fileCoverageMode = getCoverageModeFrom(fileCoverageModeRaw);
 
-	const jsonSummaryPath = path.resolve(
+	const lcovPath = path.resolve(
 		workingDirectory,
-		core.getInput("json-summary-path"),
+		core.getInput("lcov-path"),
 	);
 
-	const jsonFinalPath = path.resolve(
-		workingDirectory,
-		core.getInput("json-final-path"),
-	);
-
-	const jsonSummaryCompareInput = core.getInput("json-summary-compare-path");
-	let jsonSummaryComparePath: string | null = null;
-	if (jsonSummaryCompareInput) {
-		jsonSummaryComparePath = path.resolve(
+	const lcovCompareInput = core.getInput("lcov-compare-path");
+	let lcovComparePath: string | null = null;
+	if (lcovCompareInput) {
+		lcovComparePath = path.resolve(
 			workingDirectory,
-			jsonSummaryCompareInput,
+			lcovCompareInput,
 		);
 	}
 
@@ -53,10 +47,10 @@ async function readOptions(octokit: Octokit): Promise<Options> {
 
 	const commentOn = getCommentOn();
 
-	// ViteConfig is optional, as it is only required for thresholds. If no vite config is provided, we will not include thresholds in the final report.
+	// BunConfig is optional, as it is only required for thresholds. If no bunfig.toml is provided, we will not include thresholds in the final report.
 	const viteConfigPath = await getViteConfigPath(
 		workingDirectory,
-		core.getInput("vite-config-path"),
+		core.getInput("bunfig-path"),
 	);
 
 	const thresholds = viteConfigPath
@@ -75,9 +69,8 @@ async function readOptions(octokit: Octokit): Promise<Options> {
 
 	return {
 		fileCoverageMode,
-		jsonFinalPath,
-		jsonSummaryPath,
-		jsonSummaryComparePath,
+		lcovPath,
+		lcovComparePath,
 		name,
 		thresholds,
 		workingDirectory,

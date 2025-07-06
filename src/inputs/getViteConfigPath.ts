@@ -10,27 +10,10 @@ const testFilePath = async (workingDirectory: string, filePath: string) => {
 };
 
 const defaultPaths = [
-	"vitest.config.ts",
-	"vitest.config.mts",
-	"vitest.config.cts",
-	"vitest.config.js",
-	"vitest.config.mjs",
-	"vitest.config.cjs",
-	"vite.config.ts",
-	"vite.config.mts",
-	"vite.config.cts",
-	"vite.config.js",
-	"vite.config.mjs",
-	"vite.config.cjs",
-	"vitest.workspace.ts",
-	"vitest.workspace.mts",
-	"vitest.workspace.cts",
-	"vitest.workspace.js",
-	"vitest.workspace.mjs",
-	"vitest.workspace.cjs",
+	"bunfig.toml",
 ];
 
-const getViteConfigPath = async (workingDirectory: string, input: string) => {
+const getBunConfigPath = async (workingDirectory: string, input: string) => {
 	try {
 		if (input === "") {
 			return await Promise.any(
@@ -47,8 +30,8 @@ const getViteConfigPath = async (workingDirectory: string, input: string) => {
 			: `any default location in "${workingDirectory}"`;
 
 		core.warning(stripIndent`
-          Failed to read vite config file at ${searchPath}.
-          Make sure you provide the vite-config-path option if you're using a non-default location or name of your config file.
+          Failed to read bunfig.toml file at ${searchPath}.
+          Make sure you provide the bunfig-path option if you're using a non-default location or name of your config file.
 
           Will not include thresholds in the final report.
       `);
@@ -56,4 +39,4 @@ const getViteConfigPath = async (workingDirectory: string, input: string) => {
 	}
 };
 
-export { getViteConfigPath };
+export { getBunConfigPath as getViteConfigPath };

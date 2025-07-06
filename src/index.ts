@@ -5,9 +5,9 @@ import { FileCoverageMode } from "./inputs/FileCoverageMode.js";
 import { getPullChanges } from "./inputs/getPullChanges.js";
 import { type Options, readOptions } from "./inputs/options.js";
 import {
-	parseVitestJsonFinal,
-	parseVitestJsonSummary,
-} from "./inputs/parseJsonReports.js";
+	parseBunLcovFinal,
+	parseBunLcovSummary,
+} from "./inputs/parseLcovReports.js";
 import { type Octokit, createOctokit } from "./octokit.js";
 import { generateCommitSHAUrl } from "./report/generateCommitSHAUrl.js";
 import { generateFileCoverageHtml } from "./report/generateFileCoverageHtml.js";
@@ -25,12 +25,12 @@ const run = async () => {
 	const options = await readOptions(octokit);
 	core.info(`Using options: ${JSON.stringify(options, null, 2)}`);
 
-	const jsonSummary = await parseVitestJsonSummary(options.jsonSummaryPath);
+	const jsonSummary = await parseBunLcovSummary(options.lcovPath);
 
 	let jsonSummaryCompare: JsonSummary | undefined;
-	if (options.jsonSummaryComparePath) {
-		jsonSummaryCompare = await parseVitestJsonSummary(
-			options.jsonSummaryComparePath,
+	if (options.lcovComparePath) {
+		jsonSummaryCompare = await parseBunLcovSummary(
+			options.lcovComparePath,
 		);
 	}
 
@@ -57,7 +57,7 @@ const run = async () => {
 			octokit,
 		});
 
-		const jsonFinal = await parseVitestJsonFinal(options.jsonFinalPath);
+		const jsonFinal = await parseBunLcovFinal(options.lcovPath);
 		const fileTable = generateFileCoverageHtml({
 			jsonSummary,
 			jsonSummaryCompare,
@@ -73,7 +73,7 @@ const run = async () => {
 	const commitSHAUrl = generateCommitSHAUrl(options.commitSHA);
 
 	summary.addRaw(
-		`<em>Generated in workflow <a href=${getWorkflowSummaryURL()}>#${github.context.runNumber}</a> for commit <a href="${commitSHAUrl}">${options.commitSHA.substring(0, 7)}</a> by the <a href="https://github.com/davelosert/vitest-coverage-report-action">Vitest Coverage Report Action</a></em>`,
+		`<em>Generated in workflow <a href=${getWorkflowSummaryURL()}>#${github.context.runNumber}</a> for commit <a href="${commitSHAUrl}">${options.commitSHA.substring(0, 7)}</a> by the <a href="https://github.com/dzannotti/bun-test-coverage-report-action">Bun Test Coverage Report Action</a></em>`,
 	);
 
 	if (options.commentOn.includes("pr")) {
