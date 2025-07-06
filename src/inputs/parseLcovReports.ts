@@ -102,25 +102,25 @@ const lcovToCoverageReport = (records: LcovRecord[]): CoverageReport => {
 			total: totalLines,
 			covered: coveredLines,
 			skipped: 0,
-			pct: totalLines > 0 ? (coveredLines / totalLines) * 100 : 0
+			pct: totalLines > 0 ? Math.round((coveredLines / totalLines) * 100 * 100) / 100 : 0
 		},
 		statements: {
 			total: totalStatements,
 			covered: coveredStatements,
 			skipped: 0,
-			pct: totalStatements > 0 ? (coveredStatements / totalStatements) * 100 : 0
+			pct: totalStatements > 0 ? Math.round((coveredStatements / totalStatements) * 100 * 100) / 100 : 0
 		},
 		functions: {
 			total: totalFunctions,
 			covered: coveredFunctions,
 			skipped: 0,
-			pct: totalFunctions > 0 ? (coveredFunctions / totalFunctions) * 100 : 0
+			pct: totalFunctions > 0 ? Math.round((coveredFunctions / totalFunctions) * 100 * 100) / 100 : 0
 		},
 		branches: {
 			total: totalBranches,
 			covered: coveredBranches,
 			skipped: 0,
-			pct: totalBranches > 0 ? (coveredBranches / totalBranches) * 100 : 0
+			pct: totalBranches > 0 ? Math.round((coveredBranches / totalBranches) * 100 * 100) / 100 : 0
 		}
 	};
 };
