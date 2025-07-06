@@ -21,6 +21,9 @@ function generateSummaryTableHtml(
 			</thead>
 			<tbody>
 				<tr>
+					${generateTableRow({ reportNumbers: jsonReport.lines, category: "Overall", threshold: thresholds.lines, reportCompareNumbers: jsonCompareReport?.lines })}
+				</tr>
+				<tr>
 					${generateTableRow({ reportNumbers: jsonReport.lines, category: "Lines", threshold: thresholds.lines, reportCompareNumbers: jsonCompareReport?.lines })}
 				</tr>
 				<tr>
